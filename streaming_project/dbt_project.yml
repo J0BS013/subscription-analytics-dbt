@@ -1,0 +1,21 @@
+name: 'streaming_project'
+version: '1.0.0'
+config-version: 2 # Always good practice to explicitly define config-version
+
+profile: 'streaming_project'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  streaming_project:
+    example:
+      +materialized: view

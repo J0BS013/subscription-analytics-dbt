@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: cohort_analysis
+    description: "Análise de coorte por mês de signup dos usuários"
+    columns:
+      - name: cohort_month
+        description: "Mês da coorte (mês de signup)"
+        tests:
+          - not_null
+      
+      - name: period_number
+        description: "Número de períodos desde o signup (0, 1, 2, etc.)"
+        tests:
+          - not_null
+      
+      - name: cohort_size
+        description: "Tamanho total da coorte"
+        tests:
+          - not_null
+      
+      - name: active_users
+        description: "Usuários ativos no período"
+        tests:
+          - not_null
+      
+      - name: retention_rate_pct
+        description: "Taxa de retenção em percentual"
+        tests:
+          - not_null
+
+  - name: churn_analysis
+    description: "Análise de churn por plano e coorte mensal"
+    columns:
+      - name: plan_type
+        description: "Tipo do plano de assinatura"
+        tests:
+          - not_null
+
+      
+      - name: cohort_month
+        description: "Mês da coorte"
+        tests:
+          - not_null
+      
+      - name: total_subscribers
+        description: "Total de assinantes na coorte"
+        tests:
+          - not_null
+      
+      - name: churned_subscribers
+        description: "Número de assinantes que cancelaram"
+        tests:
+          - not_null
+      
+      - name: churn_rate_pct
+        description: "Taxa de churn em percentual"
+        tests:
+          - not_null
+      
+      - name: avg_tenure_days
+        description: "Tempo médio de permanência em dias"
+        tests:
+          - not_null
