@@ -38,4 +38,42 @@ The seed fixture contains two January 2024 subscribers. Only one is active in Fe
 
 ## Limitations and next steps
 
-This is the corrected baseline, not yet the production flagship described in the portfolio SPEC. Incremental models, snapshots, contracts, semantic metrics, freshness, and CI are planned next.
+## Architecture
+
+```text
+Versioned synthetic seeds
+  -> sources + staging (typed, deduplicated)
+  -> intermediate subscription periods / MRR movements / customer activity
+  -> finance, customer, retention and product marts
+  -> exposures: finance_dashboard and product_dashboard
+```
+
+## Production-oriented features
+
+- `fct_product_events` is incremental, keyed by `product_event_id`, with a seven-day lookback for late arrivals.
+- Product-event duplicates are deduplicated deterministically by latest `loaded_at`.
+- `customers_snapshot` tracks SCD2 history for country and acquisition-channel changes.
+- `fct_mrr_movements` enforces a dbt model contract.
+- Macros centralize safe division and FX conversion.
+- MRR supports new, expansion, contraction, churn and reactivation movements.
+- NRR uses the fixed initial subscription cohort as its denominator.
+- GitHub Actions runs `dbt build` and `dbt snapshot` for pull requests and `main`.
+
+## Quality checks
+
+Semantic tests verify the 50% cohort fixture, fixed cohort sizes, fixed NRR denominator, and full MRR bridge reconciliation. Generic tests cover keys, required fields, relationships and accepted movement values.
+
+## Failure modes and recovery
+
+If source data is late, rerun `dbt build`; the product-event model reprocesses the trailing seven days. If a source schema or contract changes, the build fails before downstream marts are promoted. For customer-attribute corrections, rerun `dbt snapshot` after the build to record a new SCD2 version. Generated DuckDB databases, logs and targets are ignored by Git.
+
+## Documentation and benchmark
+
+Generate local dbt lineage with:
+
+```bash
+dbt docs generate --project-dir streaming_project --profiles-dir .
+dbt docs serve --project-dir streaming_project --profiles-dir .
+```
+
+See [the reproducible benchmark](docs/benchmark.md) for measured local results and limitations.

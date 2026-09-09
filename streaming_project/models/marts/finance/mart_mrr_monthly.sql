@@ -5,6 +5,8 @@ WITH monthly_movements AS (
     movement_month,
     SUM(CASE WHEN movement_type = 'new' THEN mrr_delta_usd ELSE 0 END) AS new_mrr_usd,
     SUM(CASE WHEN movement_type = 'reactivation' THEN mrr_delta_usd ELSE 0 END) AS reactivation_mrr_usd,
+    SUM(CASE WHEN movement_type = 'expansion' THEN mrr_delta_usd ELSE 0 END) AS expansion_mrr_usd,
+    SUM(CASE WHEN movement_type = 'contraction' THEN mrr_delta_usd ELSE 0 END) AS contraction_mrr_usd,
     SUM(CASE WHEN movement_type = 'churn' THEN mrr_delta_usd ELSE 0 END) AS churn_mrr_usd,
     SUM(mrr_delta_usd) AS net_mrr_change_usd
   FROM {{ ref('fct_mrr_movements') }}

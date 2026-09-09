@@ -3,3 +3,5 @@ pe001,c001,workspace_created,2024-01-15,web,2024-04-01 00:00:00
 pe002,c001,dashboard_viewed,2024-02-15,web,2024-04-01 00:00:00
 pe003,c002,workspace_created,2024-01-27,web,2024-04-01 00:00:00
 pe004,c003,workspace_created,2024-02-01,mobile,2024-04-01 00:00:00
+pe004,c003,workspace_created,2024-02-01,mobile,2024-04-02 00:00:00
+pe005,c001,report_exported,2024-02-20,web,2024-04-01 00:00:00

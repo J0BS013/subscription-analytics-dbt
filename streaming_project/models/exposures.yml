@@ -1,0 +1,26 @@
+version: 2
+
+exposures:
+  - name: finance_dashboard
+    type: dashboard
+    maturity: high
+    owner:
+      name: Joabe Santos
+      email: joabe@example.com
+    url: https://example.com/finance-dashboard
+    description: Finance dashboard consuming versioned MRR and revenue metrics.
+    depends_on:
+      - ref('mart_mrr_monthly')
+      - ref('mart_nrr_monthly')
+      - ref('mart_revenue_monthly')
+  - name: product_dashboard
+    type: dashboard
+    maturity: medium
+    owner:
+      name: Joabe Santos
+      email: joabe@example.com
+    url: https://example.com/product-dashboard
+    description: Product usage dashboard consuming incremental product events and retention cohorts.
+    depends_on:
+      - ref('fct_product_events')
+      - ref('mart_retention_cohorts')

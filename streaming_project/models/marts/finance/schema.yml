@@ -34,3 +34,13 @@ models:
         tests: [not_null, unique]
       - name: revenue_usd
         tests: [not_null]
+
+  - name: mart_nrr_monthly
+    description: Net revenue retention for the fixed initial subscription cohort.
+    columns:
+      - name: movement_month
+        tests: [not_null, unique]
+      - name: initial_cohort_mrr_usd
+        tests: [not_null]
+      - name: nrr_pct
+        tests: [not_null]
