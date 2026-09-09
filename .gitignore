@@ -1,0 +1,10 @@
+# dbt generated artifacts
+logs/
+target/
+dbt_packages/
+
+# Local DuckDB development databases
+*.duckdb
+
+# Local dbt user configuration
+.user.yml

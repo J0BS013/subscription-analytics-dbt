@@ -1,5 +1,6 @@
 user_id,event_date,event_type,platform
 1,2024-01-15,subscription_start,netflix
+1,2024-02-15,payment_success,netflix
 1,2024-03-15,payment_success,netflix
 2,2024-01-20,subscription_start,disney
 3,2024-02-01,subscription_start,netflix

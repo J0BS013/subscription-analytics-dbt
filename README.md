@@ -1,232 +1,40 @@
-# DBT Analytics Workshop 🚀
+# Subscription Analytics with dbt and DuckDB
 
-A comprehensive dbt (data build tool) learning project designed for hands-on practice with data transformations, testing, and quality assurance. This repository contains a complete dbt project structure with real-world examples including streaming data analysis, customer cohorts, and subscription analytics using **DuckDB** as the analytical database.
+A small, reproducible dbt project for subscription churn and retention analysis. It runs locally on DuckDB using versioned seed data.
 
-## 🎯 Project Purpose
+## What it demonstrates
 
-This project serves as a learning playground and QA environment for:
-- **Data Modeling**: Building dimensional models and analytics tables
-- **Testing**: Implementing data quality tests and validation
-- **Seeds**: Managing reference data and lookup tables
-- **Macros**: Creating reusable SQL functions
-- **Documentation**: Generating and maintaining data lineage
-- **DuckDB Integration**: Fast analytics with embedded database
+- Cohort retention with a fixed cohort denominator.
+- Subscription lifecycle and churn by plan and signup month.
+- dbt schema tests plus a semantic regression test for retention.
+- Reproducible local execution without external credentials.
 
-## 📊 What's Inside
+## Quick start
 
-### Models
-- `churn_analysis.sql` - Customer churn prediction and analysis
-- `cohort_analysis.sql` - Customer cohort behavior tracking
-- Dimensional models for streaming analytics
-
-### Seeds
-- `events.csv` - Sample event data for testing
-- `subscriptions.csv` - Customer subscription reference data
-- Additional lookup tables
-
-### Tests
-- Schema tests for data validation
-- Custom data quality checks
-- Referential integrity tests
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.7+
-- dbt-core and dbt-duckdb installed
-
-### Setup Instructions
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/J0BS013/dbt-analytical-streaming-data.git
-   cd dbt-analytical-streaming-data
-   ```
-
-2. **Create virtual environment (recommended)**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   # OR install manually:
-   pip install dbt-core dbt-duckdb
-   ```
-
-4. **Configure DuckDB connection**
-   ```bash
-   # The project is pre-configured to use DuckDB
-   # Check profiles.yml for connection details
-   dbt debug  # Test your connection
-   ```
-
-5. **Load seed data**
-   ```bash
-   dbt seed
-   ```
-
-6. **Run the models**
-   ```bash
-   dbt run
-   ```
-
-7. **Run tests**
-   ```bash
-   dbt test
-   ```
-
-8. **Generate documentation**
-   ```bash
-   dbt docs generate
-   dbt docs serve
-   ```
-
-## 🧪 Testing Examples
-
-### Basic Commands
 ```bash
-# Run all models
-dbt run
-
-# Run specific model
-dbt run --models churn_analysis
-
-# Run models with dependencies
-dbt run --models +churn_analysis
-
-# Run downstream models
-dbt run --models churn_analysis+
-
-# Run tests only
-dbt test
-
-# Test specific model
-dbt test --models cohort_analysis
+python -m pip install -r requirements.txt
+dbt build --project-dir streaming_project --profiles-dir .
 ```
 
-### Advanced Testing
-```bash
-# Run models with full refresh
-dbt run --full-refresh
+The build loads the CSV seeds, materializes the models, and runs every test. The generated local database is `streaming_project/streaming_data.duckdb`.
 
-# Test data freshness
-dbt source freshness
+## Semantic regression check
 
-# Run specific tag
-dbt run --models tag:analytics
+The seed fixture contains two January 2024 subscribers. Only one is active in February, so the January cohort's month-one retention must be **50%**:
 
-# Dry run (compile only)
-dbt compile
+| cohort_month | period_number | cohort_size | active_users | retention_rate_pct |
+|---|---:|---:|---:|---:|
+| 2024-01-01 | 1 | 2 | 1 | 50.00 |
 
-# Run and test together
-dbt build
-```
+`streaming_project/tests/cohort_retention_denominator.sql` fails the dbt build if that result changes. Cohort size is calculated before activity joins and stays fixed across periods.
 
-### Data Quality Validation
-```bash
-# Run schema tests
-dbt test --select test_type:schema
+## Model grains
 
-# Run data tests
-dbt test --select test_type:data
+| Model | Grain |
+|---|---|
+| `cohort_analysis` | signup cohort month × activity month |
+| `churn_analysis` | plan type × signup cohort month |
 
-# Generate and serve documentation
-dbt docs generate && dbt docs serve
+## Limitations and next steps
 
-# Check model freshness
-dbt source freshness --select source:raw_data
-```
-
-### DuckDB Specific Commands
-```bash
-# Connect directly to DuckDB
-duckdb streaming_project.duckdb
-
-# Query your models directly
-duckdb streaming_project.duckdb -c "SELECT * FROM churn_analysis LIMIT 10;"
-
-# Export results
-dbt run && duckdb streaming_project.duckdb -c "COPY (SELECT * FROM cohort_analysis) TO 'output.csv' (HEADER, DELIMITER ',')"
-```
-
-## 📁 Project Structure
-
-```
-streaming_project/
-├── analyses/           # Analytical SQL files
-├── macros/            # Reusable SQL macros
-├── models/            # dbt models
-│   ├── staging/       # Raw data transformations
-│   ├── intermediate/  # Business logic layer  
-│   └── marts/         # Final analytics tables
-├── seeds/             # CSV reference data
-│   ├── events.csv
-│   └── subscriptions.csv
-├── snapshots/         # SCD Type 2 tables
-├── tests/             # Custom data tests
-├── target/            # Compiled SQL (git ignored)
-├── dbt_project.yml    # Project configuration
-├── profiles.yml       # Database connections
-├── requirements.txt   # Python dependencies
-└── README.md          # This file
-```
-
-## 🦆 Why DuckDB?
-
-This project uses **DuckDB** as the analytical database because:
-- **Fast**: Optimized for analytical workloads
-- **Embedded**: No server setup required
-- **SQL Compatible**: Standard SQL with analytical extensions
-- **Portable**: Single file database
-- **Python Integration**: Great for data science workflows
-
-
-
-### Manual requirements.txt
-```txt
-dbt-core>=1.6.0
-dbt-duckdb>=1.6.0
-```
-
-## 🧪 Sample Queries to Test
-
-After running `dbt run`, try these queries in DuckDB:
-
-```sql
--- Check model results
-SELECT * FROM churn_analysis LIMIT 5;
-
--- Analyze cohort data
-SELECT 
-    cohort_month,
-    COUNT(*) as customers,
-    AVG(revenue) as avg_revenue
-FROM cohort_analysis 
-GROUP BY cohort_month 
-ORDER BY cohort_month;
-
--- Data quality check
-SELECT 
-    COUNT(*) as total_records,
-    COUNT(DISTINCT customer_id) as unique_customers
-FROM events;
-```
-
-## 📚 Resources
-
-- [dbt Documentation](https://docs.getdbt.com/)
-- [dbt-DuckDB Documentation](https://github.com/duckdb/dbt-duckdb)
-- [DuckDB Documentation](https://duckdb.org/docs/)
-- [dbt Learn](https://learn.getdbt.com/)
-- [dbt Community](https://community.getdbt.com/)
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-**Happy modeling with DuckDB!** 🦆🎉
+This is the corrected baseline, not yet the production flagship described in the portfolio SPEC. Incremental models, snapshots, contracts, semantic metrics, freshness, and CI are planned next.

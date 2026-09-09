@@ -14,8 +14,3 @@ snapshot-paths: ["snapshots"]
 clean-targets:
   - "target"
   - "dbt_packages"
-
-models:
-  streaming_project:
-    example:
-      +materialized: view

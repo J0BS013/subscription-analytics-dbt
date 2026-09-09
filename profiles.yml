@@ -2,6 +2,6 @@ streaming_project:
   outputs:
     dev:
       type: duckdb
-      path: './streaming_data.duckdb'
+      path: 'streaming_project/streaming_data.duckdb'
       threads: 4
   target: dev
