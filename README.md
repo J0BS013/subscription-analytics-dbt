@@ -14,9 +14,10 @@ A small, reproducible dbt project for subscription churn and retention analysis.
 ```bash
 python -m pip install -r requirements.txt
 dbt build --project-dir streaming_project --profiles-dir .
+dbt snapshot --project-dir streaming_project --profiles-dir .
 ```
 
-The build loads the CSV seeds, materializes the models, and runs every test. The generated local database is `streaming_project/streaming_data.duckdb`.
+The build loads the CSV seeds, materializes the models, and runs every test. The snapshot command captures SCD2 history for country and acquisition-channel changes. The generated local database is `streaming_project/streaming_data.duckdb`.
 
 ## Semantic regression check
 

@@ -5,8 +5,18 @@ models:
     description: Atomic MRR movement fact table at movement-event grain.
     columns:
       - name: movement_id
+        data_type: varchar
         tests: [not_null, unique]
+      - name: subscription_id
+        data_type: varchar
+      - name: customer_id
+        data_type: varchar
+      - name: movement_month
+        data_type: date
+      - name: movement_type
+        data_type: varchar
       - name: mrr_delta_usd
+        data_type: decimal(18,2)
         tests: [not_null]
 
   - name: mart_mrr_monthly

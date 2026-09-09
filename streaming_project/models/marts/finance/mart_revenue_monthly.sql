@@ -14,10 +14,7 @@ converted_invoices AS (
   SELECT
     DATE_TRUNC('month', invoices.invoice_date) AS revenue_month,
     invoices.invoice_id,
-    CASE
-      WHEN invoices.currency = 'USD' THEN invoices.total_amount
-      ELSE invoices.total_amount * rates.rate
-    END AS revenue_usd
+    {{ convert_to_usd('invoices.total_amount', 'invoices.currency', 'rates.rate') }} AS revenue_usd
   FROM paid_invoices AS invoices
   INNER JOIN successful_payments AS payments
     ON invoices.invoice_id = payments.invoice_id
