@@ -1,8 +1,8 @@
 # Subscription Analytics with dbt and DuckDB
 
-A reproducible, production-style dbt project for subscription analytics. It runs locally on DuckDB using versioned synthetic seed data and demonstrates reliable financial, retention, customer, and product analytics.
+A reproducible dbt project for subscription analytics. It runs locally on DuckDB using versioned synthetic seed data for financial, retention, customer, and product analytics.
 
-## What it demonstrates
+## Capabilities
 
 - Cohort retention and NRR with fixed denominators.
 - Subscription lifecycle, churn, MRR movements, and monthly revenue marts.
