@@ -1,0 +1,4 @@
+rate_date,base_currency,quote_currency,rate,loaded_at
+2024-01-01,EUR,USD,1.10,2024-04-01 00:00:00
+2024-02-01,EUR,USD,1.08,2024-04-01 00:00:00
+2024-03-01,EUR,USD,1.09,2024-04-01 00:00:00

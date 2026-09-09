@@ -1,0 +1,6 @@
+invoice_id,subscription_id,customer_id,invoice_date,currency,total_amount,status,loaded_at
+i001,s001,c001,2024-01-15,USD,50.00,paid,2024-04-01 00:00:00
+i002,s001,c001,2024-02-15,USD,50.00,paid,2024-04-01 00:00:00
+i003,s002,c002,2024-01-20,USD,20.00,paid,2024-04-01 00:00:00
+i004,s002,c002,2024-02-20,USD,20.00,failed,2024-04-01 00:00:00
+i005,s003,c003,2024-02-01,EUR,20.00,paid,2024-04-01 00:00:00

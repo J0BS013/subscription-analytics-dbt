@@ -1,0 +1,6 @@
+event_id,subscription_id,customer_id,event_type,event_at,plan_id,loaded_at
+se001,s001,c001,activated,2024-01-15,p_pro,2024-04-01 00:00:00
+se002,s002,c002,trial_started,2024-01-20,p_basic,2024-04-01 00:00:00
+se003,s002,c002,activated,2024-01-27,p_basic,2024-04-01 00:00:00
+se004,s003,c003,activated,2024-02-01,p_basic,2024-04-01 00:00:00
+se005,s003,c003,cancelled,2024-02-25,p_basic,2024-04-01 00:00:00

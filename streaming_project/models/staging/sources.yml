@@ -1,0 +1,25 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Versioned synthetic source data for the local subscription demo.
+    schema: main
+    tables:
+      - name: customers
+        loaded_at_field: loaded_at
+      - name: subscriptions
+      - name: events
+      - name: plans
+        loaded_at_field: loaded_at
+      - name: invoices
+        loaded_at_field: loaded_at
+      - name: invoice_lines
+        loaded_at_field: loaded_at
+      - name: payments
+        loaded_at_field: loaded_at
+      - name: subscription_events
+        loaded_at_field: loaded_at
+      - name: product_events
+        loaded_at_field: loaded_at
+      - name: currency_rates
+        loaded_at_field: loaded_at

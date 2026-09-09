@@ -1,0 +1,6 @@
+payment_id,invoice_id,payment_date,amount,currency,payment_status,loaded_at
+pay001,i001,2024-01-15,50.00,USD,succeeded,2024-04-01 00:00:00
+pay002,i002,2024-02-15,50.00,USD,succeeded,2024-04-01 00:00:00
+pay003,i003,2024-01-20,20.00,USD,succeeded,2024-04-01 00:00:00
+pay004,i004,2024-02-20,20.00,USD,failed,2024-04-01 00:00:00
+pay005,i005,2024-02-01,20.00,EUR,succeeded,2024-04-01 00:00:00

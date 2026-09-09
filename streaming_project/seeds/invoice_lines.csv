@@ -1,0 +1,6 @@
+invoice_line_id,invoice_id,plan_id,quantity,amount,loaded_at
+il001,i001,p_pro,1,50.00,2024-04-01 00:00:00
+il002,i002,p_pro,1,50.00,2024-04-01 00:00:00
+il003,i003,p_basic,1,20.00,2024-04-01 00:00:00
+il004,i004,p_basic,1,20.00,2024-04-01 00:00:00
+il005,i005,p_basic,1,20.00,2024-04-01 00:00:00
