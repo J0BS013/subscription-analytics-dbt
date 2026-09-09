@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: int_subscription_periods
+    description: One row per subscription lifecycle, from activation to cancellation.
+    columns:
+      - name: subscription_id
+        tests: [not_null, unique]
+      - name: customer_id
+        tests: [not_null]
+      - name: plan_id
+        tests: [not_null]
+      - name: monthly_mrr_usd
+        tests: [not_null]
+
+  - name: int_mrr_movements
+    description: One row per subscription revenue movement event.
+    columns:
+      - name: movement_id
+        tests: [not_null, unique]
+      - name: movement_type
+        tests:
+          - accepted_values:
+              values: ['new', 'churn', 'reactivation']
