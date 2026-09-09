@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: dim_customers
+    columns:
+      - name: customer_id
+        tests: [not_null, unique]
+  - name: fct_subscriptions
+    columns:
+      - name: subscription_id
+        tests: [not_null, unique]
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
+  - name: mart_retention_cohorts
+    columns:
+      - name: cohort_month
+        tests: [not_null]
+      - name: retention_rate_pct
+        tests: [not_null]
