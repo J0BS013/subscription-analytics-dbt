@@ -1,23 +1,22 @@
 # Subscription Analytics with dbt and DuckDB
 
-A small, reproducible dbt project for subscription churn and retention analysis. It runs locally on DuckDB using versioned seed data.
+A reproducible, production-style dbt project for subscription analytics. It runs locally on DuckDB using versioned synthetic seed data and demonstrates reliable financial, retention, customer, and product analytics.
 
 ## What it demonstrates
 
-- Cohort retention with a fixed cohort denominator.
-- Subscription lifecycle and churn by plan and signup month.
-- dbt schema tests plus a semantic regression test for retention.
-- Reproducible local execution without external credentials.
+- Cohort retention and NRR with fixed denominators.
+- Subscription lifecycle, churn, MRR movements, and monthly revenue marts.
+- Incremental product events, SCD Type 2 customer history, and enforced model contracts.
+- dbt schema and semantic tests with reproducible CI on clean environments.
 
 ## Quick start
 
 ```bash
 python -m pip install -r requirements.txt
 dbt build --project-dir streaming_project --profiles-dir .
-dbt snapshot --project-dir streaming_project --profiles-dir .
 ```
 
-The build loads the CSV seeds, materializes the models, and runs every test. The snapshot command captures SCD2 history for country and acquisition-channel changes. The generated local database is `streaming_project/streaming_data.duckdb`.
+The build loads the CSV seeds, materializes the models, runs every test, and executes the customer snapshot. To capture a new SCD2 version after a customer-attribute correction, run `dbt snapshot --project-dir streaming_project --profiles-dir .` separately. The generated local database is `streaming_project/streaming_data.duckdb`.
 
 ## Semantic regression check
 
@@ -35,8 +34,6 @@ The seed fixture contains two January 2024 subscribers. Only one is active in Fe
 |---|---|
 | `cohort_analysis` | signup cohort month × activity month |
 | `churn_analysis` | plan type × signup cohort month |
-
-## Limitations and next steps
 
 ## Architecture
 
@@ -57,11 +54,11 @@ Versioned synthetic seeds
 - Macros centralize safe division and FX conversion.
 - MRR supports new, expansion, contraction, churn and reactivation movements.
 - NRR uses the fixed initial subscription cohort as its denominator.
-- GitHub Actions runs `dbt build` and `dbt snapshot` for pull requests and `main`.
+- GitHub Actions loads the seeds and then runs `dbt build` on every pull request and push to `main`, reproducing the pipeline from a clean environment.
 
 ## Quality checks
 
-Semantic tests verify the 50% cohort fixture, fixed cohort sizes, fixed NRR denominator, and full MRR bridge reconciliation. Generic tests cover keys, required fields, relationships and accepted movement values.
+Semantic tests verify the 50% cohort fixture, fixed cohort sizes, fixed NRR denominator, and full MRR bridge reconciliation. Generic tests cover keys, required fields, relationships and accepted movement values. CI validates all 76 dbt nodes: 10 seeds and 66 build nodes.
 
 ## Failure modes and recovery
 
