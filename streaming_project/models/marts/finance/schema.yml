@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: fct_mrr_movements
+    description: Atomic MRR movement fact table at movement-event grain.
+    columns:
+      - name: movement_id
+        tests: [not_null, unique]
+      - name: mrr_delta_usd
+        tests: [not_null]
+
+  - name: mart_mrr_monthly
+    description: Monthly MRR bridge with ending MRR calculated from cumulative movement deltas.
+    columns:
+      - name: movement_month
+        tests: [not_null, unique]
+      - name: ending_mrr_usd
+        tests: [not_null]
+
+  - name: mart_revenue_monthly
+    description: Paid invoice revenue converted to USD at the monthly FX rate.
+    columns:
+      - name: revenue_month
+        tests: [not_null, unique]
+      - name: revenue_usd
+        tests: [not_null]
