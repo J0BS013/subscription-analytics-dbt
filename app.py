@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+import subprocess
+import sys
 
 import duckdb
 import pandas as pd
@@ -12,6 +14,7 @@ import streamlit as st
 
 
 DATABASE_PATH = Path(__file__).parent / "streaming_project" / "streaming_data.duckdb"
+PROJECT_ROOT = Path(__file__).parent
 MOVEMENT_COLORS = {"new": "#32c48d", "expansion": "#6ea8fe", "reactivation": "#b99cff", "contraction": "#f6bd60", "churn": "#ff6b6b"}
 
 
@@ -46,13 +49,35 @@ def month_labels(frame: pd.DataFrame, column: str) -> pd.DataFrame:
     return result
 
 
+def ensure_database() -> tuple[bool, str]:
+    """Build the local DuckDB marts when the app starts in a clean environment."""
+    if DATABASE_PATH.exists():
+        return True, ""
+    command = [
+        sys.executable,
+        "-m",
+        "dbt.cli.main",
+        "build",
+        "--project-dir",
+        "streaming_project",
+        "--profiles-dir",
+        ".",
+        "--no-use-colors",
+    ]
+    result = subprocess.run(command, cwd=PROJECT_ROOT, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        return False, (result.stdout + "\n" + result.stderr).strip()
+    return DATABASE_PATH.exists(), "dbt completed without creating the expected DuckDB database."
+
+
 st.set_page_config(page_title="Subscription Analytics", page_icon="📈", layout="wide")
 st.title("Subscription Analytics")
 st.caption("A business view built from tested dbt marts in DuckDB.")
 
-if not DATABASE_PATH.exists():
-    st.error("The local DuckDB database was not found. Run the dbt build before starting the dashboard.")
-    st.code("python -m dbt.cli.main build --project-dir streaming_project --profiles-dir .", language="powershell")
+database_ready, build_error = ensure_database()
+if not database_ready:
+    st.error("The tested dbt marts could not be built.")
+    st.code(build_error, language="text")
     st.stop()
 
 with st.sidebar:
@@ -73,7 +98,7 @@ movements = month_labels(marts["movements"], "movement_month")
 latest_mrr = mrr.iloc[-1]
 latest_nrr = nrr.iloc[-1]
 latest_revenue = revenue.iloc[-1]
-latest_retention = retention.sort_values("activity_month").iloc[-1]
+month_one_retention = retention.loc[retention["period_number"] == 1].sort_values("cohort_month").iloc[-1]
 first_month_mrr = float(mrr.iloc[0]["ending_mrr_usd"])
 mrr_growth = (float(latest_mrr["ending_mrr_usd"]) / first_month_mrr - 1) * 100 if first_month_mrr else 0
 
@@ -81,7 +106,7 @@ first, second, third, fourth = st.columns(4)
 first.metric("Ending MRR", usd(float(latest_mrr["ending_mrr_usd"])), f"{mrr_growth:+.0f}% since {mrr.iloc[0]['month_label']}")
 second.metric("Net Revenue Retention", pct(float(latest_nrr["nrr_pct"])), latest_nrr["month_label"])
 third.metric("Paid revenue", usd(float(latest_revenue["revenue_usd"])), latest_revenue["month_label"])
-fourth.metric("Latest cohort retention", pct(float(latest_retention["retention_rate_pct"])), f"period {int(latest_retention['period_number'])}")
+fourth.metric("Month-one retention", pct(float(month_one_retention["retention_rate_pct"])), month_one_retention["cohort_month"].strftime("%b %Y cohort"))
 
 overview_tab, movements_tab, retention_tab = st.tabs(["Executive overview", "MRR bridge", "Retention and quality"])
 

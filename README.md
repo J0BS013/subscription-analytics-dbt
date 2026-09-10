@@ -88,6 +88,12 @@ The synthetic fixture demonstrates MRR growth from US$70 to US$140, 50% month-on
 
 It is a local synthetic-data demo, not a production reporting system.
 
+![Subscription analytics dashboard](docs/assets/subscription-analytics-dashboard.png)
+
+### Deployment
+
+The application is compatible with Streamlit Community Cloud and similar Python hosting services. It uses `app.py` as the entry point and installs dependencies from `requirements.txt`. In a clean environment, the app runs the pinned dbt Core build once to materialize the tested DuckDB marts before loading the dashboard; no credentials or external database are required.
+
 ## Key models
 
 | Model | Grain | Purpose |
