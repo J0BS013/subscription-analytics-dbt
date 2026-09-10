@@ -51,7 +51,7 @@ python -m pip install -r requirements.txt
 Run the complete local build:
 
 ```bash
-dbt build --project-dir streaming_project --profiles-dir .
+python -m dbt.cli.main build --project-dir streaming_project --profiles-dir .
 ```
 
 The build loads the CSV seeds, creates models, runs tests, and executes the customer snapshot. The local database is written to `streaming_project/streaming_data.duckdb`.
@@ -59,14 +59,14 @@ The build loads the CSV seeds, creates models, runs tests, and executes the cust
 Run only the snapshot after a customer-attribute correction:
 
 ```bash
-dbt snapshot --project-dir streaming_project --profiles-dir .
+python -m dbt.cli.main snapshot --project-dir streaming_project --profiles-dir .
 ```
 
 Generate and serve local lineage documentation:
 
 ```bash
-dbt docs generate --project-dir streaming_project --profiles-dir .
-dbt docs serve --project-dir streaming_project --profiles-dir .
+python -m dbt.cli.main docs generate --project-dir streaming_project --profiles-dir .
+python -m dbt.cli.main docs serve --project-dir streaming_project --profiles-dir .
 ```
 
 ## Key models

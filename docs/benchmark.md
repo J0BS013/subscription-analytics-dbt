@@ -3,7 +3,7 @@
 ## Reproduce
 
 ```bash
-dbt build --project-dir streaming_project --profiles-dir . --no-use-colors
+python -m dbt.cli.main build --project-dir streaming_project --profiles-dir . --no-use-colors
 ```
 
 ## Measured result
