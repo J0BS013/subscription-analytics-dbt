@@ -69,6 +69,25 @@ python -m dbt.cli.main docs generate --project-dir streaming_project --profiles-
 python -m dbt.cli.main docs serve --project-dir streaming_project --profiles-dir .
 ```
 
+## Interactive dashboard
+
+Build the dbt project first, then launch the local dashboard:
+
+```bash
+python -m dbt.cli.main build --project-dir streaming_project --profiles-dir .
+streamlit run app.py
+```
+
+The dashboard reads only the materialized dbt marts in DuckDB and is organized into three views:
+
+- **Executive overview:** ending MRR, paid revenue, NRR, retention, and the main business findings.
+- **MRR bridge:** new, expansion, reactivation, contraction, and churn movements reconciled with ending MRR.
+- **Retention and quality:** cohort-retention heatmap, NRR trend, test coverage, late-event policy, and SCD Type 2 history.
+
+The synthetic fixture demonstrates MRR growth from US$70 to US$140, 50% month-one retention for the January cohort using a fixed denominator, and March NRR of 171.4%. NRR is presented separately from customer retention because expansion and reactivation can increase retained revenue without increasing retained logos.
+
+It is a local synthetic-data demo, not a production reporting system.
+
 ## Key models
 
 | Model | Grain | Purpose |

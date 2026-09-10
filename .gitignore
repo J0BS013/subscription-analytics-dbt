@@ -3,6 +3,7 @@ logs/
 target/
 dbt_packages/
 state/
+__pycache__/
 
 # Local DuckDB development databases
 *.duckdb
