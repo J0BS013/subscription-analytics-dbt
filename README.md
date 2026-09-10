@@ -1,76 +1,105 @@
 # Subscription Analytics with dbt and DuckDB
 
-A reproducible dbt project for subscription analytics. It runs locally on DuckDB using versioned synthetic seed data for financial, retention, customer, and product analytics.
+A local dbt project for subscription analytics. It loads versioned synthetic data into DuckDB and produces tested models for MRR, revenue, churn, retention, customer activity, and product events.
 
-## Capabilities
+## What it calculates
 
-- Cohort retention and NRR with fixed denominators.
-- Subscription lifecycle, churn, MRR movements, and monthly revenue marts.
-- Incremental product events, SCD Type 2 customer history, and enforced model contracts.
-- dbt schema and semantic tests with reproducible CI on clean environments.
-
-## Quick start
-
-```bash
-python -m pip install -r requirements.txt
-dbt build --project-dir streaming_project --profiles-dir .
-```
-
-The build loads the CSV seeds, materializes the models, runs every test, and executes the customer snapshot. To capture a new SCD2 version after a customer-attribute correction, run `dbt snapshot --project-dir streaming_project --profiles-dir .` separately. The generated local database is `streaming_project/streaming_data.duckdb`.
-
-## Semantic regression check
-
-The seed fixture contains two January 2024 subscribers. Only one is active in February, so the January cohort's month-one retention must be **50%**:
-
-| cohort_month | period_number | cohort_size | active_users | retention_rate_pct |
-|---|---:|---:|---:|---:|
-| 2024-01-01 | 1 | 2 | 1 | 50.00 |
-
-`streaming_project/tests/cohort_retention_denominator.sql` fails the dbt build if that result changes. Cohort size is calculated before activity joins and stays fixed across periods.
-
-## Model grains
-
-| Model | Grain |
-|---|---|
-| `cohort_analysis` | signup cohort month × activity month |
-| `churn_analysis` | plan type × signup cohort month |
+- Monthly recurring revenue and monthly revenue.
+- MRR movements: new, expansion, contraction, churn, and reactivation.
+- Net Revenue Retention with a fixed initial-cohort denominator.
+- Subscription cohorts, retention rates, and churn by plan and signup month.
+- Customer subscription history and SCD Type 2 changes.
+- Product events with incremental processing and late-event handling.
 
 ## Architecture
 
 ```text
 Versioned synthetic seeds
-  -> sources + staging (typed, deduplicated)
-  -> intermediate subscription periods / MRR movements / customer activity
-  -> finance, customer, retention and product marts
-  -> exposures: finance_dashboard and product_dashboard
+  -> typed staging models
+  -> subscription periods, MRR movements, customer activity
+  -> finance, customer, retention, and product marts
+  -> dashboard exposures and dbt documentation
 ```
 
-## Production-oriented features
+## Project structure
 
-- `fct_product_events` is incremental, keyed by `product_event_id`, with a seven-day lookback for late arrivals.
-- Product-event duplicates are deduplicated deterministically by latest `loaded_at`.
-- `customers_snapshot` tracks SCD2 history for country and acquisition-channel changes.
-- `fct_mrr_movements` enforces a dbt model contract.
-- Macros centralize safe division and FX conversion.
-- MRR supports new, expansion, contraction, churn and reactivation movements.
-- NRR uses the fixed initial subscription cohort as its denominator.
-- GitHub Actions loads the seeds and then runs `dbt build` on every pull request and push to `main`, reproducing the pipeline from a clean environment.
+```text
+streaming_project/
+├── seeds/                     # Versioned subscription source fixtures
+├── models/
+│   ├── staging/                # Typed billing, CRM, and product sources
+│   ├── intermediate/           # Subscription periods, MRR movements, activity
+│   └── marts/
+│       ├── finance/            # MRR, revenue, and NRR marts
+│       ├── customer/           # Customers, subscriptions, and cohorts
+│       └── product/            # Incremental product events
+├── snapshots/                  # Customer SCD Type 2 history
+├── tests/                      # Semantic regression tests
+└── macros/                     # Safe division and FX conversion helpers
+```
 
-## Quality checks
+## Setup
 
-Semantic tests verify the 50% cohort fixture, fixed cohort sizes, fixed NRR denominator, and full MRR bridge reconciliation. Generic tests cover keys, required fields, relationships and accepted movement values. CI validates all 76 dbt nodes: 10 seeds and 66 build nodes.
+```bash
+git clone https://github.com/J0BS013/subscription-analytics-dbt.git
+cd subscription-analytics-dbt
+python -m pip install -r requirements.txt
+```
 
-## Failure modes and recovery
+## How to run
 
-If source data is late, rerun `dbt build`; the product-event model reprocesses the trailing seven days. If a source schema or contract changes, the build fails before downstream marts are promoted. For customer-attribute corrections, rerun `dbt snapshot` after the build to record a new SCD2 version. Generated DuckDB databases, logs and targets are ignored by Git.
+Run the complete local build:
 
-## Documentation and benchmark
+```bash
+dbt build --project-dir streaming_project --profiles-dir .
+```
 
-Generate local dbt lineage with:
+The build loads the CSV seeds, creates models, runs tests, and executes the customer snapshot. The local database is written to `streaming_project/streaming_data.duckdb`.
+
+Run only the snapshot after a customer-attribute correction:
+
+```bash
+dbt snapshot --project-dir streaming_project --profiles-dir .
+```
+
+Generate and serve local lineage documentation:
 
 ```bash
 dbt docs generate --project-dir streaming_project --profiles-dir .
 dbt docs serve --project-dir streaming_project --profiles-dir .
 ```
 
-See [the reproducible benchmark](docs/benchmark.md) for measured local results and limitations.
+## Key models
+
+| Model | Grain | Purpose |
+|---|---|---|
+| `int_subscription_periods` | subscription × month | Active periods and monthly recurring revenue |
+| `int_mrr_movements` | subscription movement × month | New, expansion, contraction, churn, and reactivation |
+| `fct_mrr_movements` | MRR movement | Enforced contract for the finance interface |
+| `mart_mrr_monthly` | month | MRR bridge and ending MRR |
+| `mart_nrr_monthly` | month | Fixed-cohort Net Revenue Retention |
+| `mart_retention_cohorts` | signup cohort × activity month | Retention analysis |
+| `fct_product_events` | product event | Incremental, deduplicated event fact |
+| `customers_snapshot` | customer version | SCD Type 2 customer history |
+
+## Data quality and semantic checks
+
+The project includes 43 data tests and semantic checks for:
+
+- a January 2024 cohort of two subscribers retaining one active subscriber in February, producing 50% retention;
+- fixed cohort-size and NRR denominators;
+- MRR bridge reconciliation;
+- unique keys, required fields, relationships, and allowed movement types;
+- product-event deduplication and model contracts.
+
+The complete local build validates 76 dbt nodes: 10 seeds and 66 build nodes. GitHub Actions runs the seed and build path on pushes and pull requests.
+
+## Late data and recovery
+
+`fct_product_events` reprocesses a seven-day lookback window so late-arriving product events can update recent output. If a source schema or model contract changes, dbt fails before downstream marts are built. Generated DuckDB databases, logs, and target artifacts are ignored by Git.
+
+## Assumptions and limitations
+
+- The source data is synthetic and intended for local analytics workflows.
+- Currency conversion, revenue, and retention definitions are implemented for the supplied fixture.
+- See [the benchmark](docs/benchmark.md) for measured local execution results and limitations.
