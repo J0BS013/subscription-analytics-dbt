@@ -8,7 +8,7 @@ dbt build --project-dir streaming_project --profiles-dir . --no-use-colors
 
 ## Measured result
 
-On the local development environment, the complete build processed 10 seed files, 10 table models, 1 incremental model, 1 snapshot, 11 views, and 43 data tests in **1.63 seconds** (76 successful dbt nodes). This is a smoke-sized synthetic fixture, not a production-scale benchmark.
+On the local development environment, the complete build processed 10 seed files, 10 table models, 1 incremental model, 1 snapshot, 11 views, and 43 data tests in **5.33 seconds** (76 successful dbt nodes). This is a smoke-sized synthetic fixture, not a production-scale benchmark. Runtime will vary by machine and dependency-cache state.
 
 ## Trade-offs
 

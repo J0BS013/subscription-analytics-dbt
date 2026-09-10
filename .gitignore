@@ -2,6 +2,7 @@
 logs/
 target/
 dbt_packages/
+state/
 
 # Local DuckDB development databases
 *.duckdb

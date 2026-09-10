@@ -94,6 +94,12 @@ The project includes 43 data tests and semantic checks for:
 
 The complete local build validates 76 dbt nodes: 10 seeds and 66 build nodes. GitHub Actions runs the seed and build path on pushes and pull requests.
 
+## Versioned metrics and CI
+
+The [metric contract](streaming_project/semantic_models/subscription_metrics.yml) defines the model, grain, aggregation rule, and denominator for MRR, MRR change, paid revenue, NRR, and cohort retention. It prevents dashboards from independently redefining business metrics; in particular, ending MRR is a month-end balance and must not be summed across months.
+
+On pull requests, GitHub Actions creates a parse manifest for the base branch and publishes the state-aware impacted dbt graph. The project also performs a clean full build because the local DuckDB CI environment has no persistent warehouse relations to defer to. See [warehouse portability](docs/warehouse-portability.md) for how this maps to managed warehouses.
+
 ## Late data and recovery
 
 `fct_product_events` reprocesses a seven-day lookback window so late-arriving product events can update recent output. If a source schema or model contract changes, dbt fails before downstream marts are built. Generated DuckDB databases, logs, and target artifacts are ignored by Git.
@@ -103,3 +109,4 @@ The complete local build validates 76 dbt nodes: 10 seeds and 66 build nodes. Gi
 - The source data is synthetic and intended for local analytics workflows.
 - Currency conversion, revenue, and retention definitions are implemented for the supplied fixture.
 - See [the benchmark](docs/benchmark.md) for measured local execution results and limitations.
+- See [warehouse portability](docs/warehouse-portability.md) for adapter, physical-design, and CI trade-offs.

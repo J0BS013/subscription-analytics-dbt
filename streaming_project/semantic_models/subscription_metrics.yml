@@ -1,0 +1,53 @@
+# Versioned metric contract for the subscription analytics marts.
+# This project runs on dbt Core + DuckDB, so the metrics are declared as a
+# portable contract rather than depending on a hosted semantic-layer service.
+version: 1
+
+metrics:
+  - name: ending_mrr_usd
+    label: Ending MRR (USD)
+    model: ref('mart_mrr_monthly')
+    grain: movement_month
+    expression: ending_mrr_usd
+    aggregation: max
+    time_dimension: movement_month
+    description: Month-end recurring revenue. Use the latest month when reporting a period; do not sum month-end balances.
+
+  - name: mrr_change_usd
+    label: Net MRR change (USD)
+    model: ref('mart_mrr_monthly')
+    grain: movement_month
+    expression: net_mrr_change_usd
+    aggregation: sum
+    time_dimension: movement_month
+    description: Net monthly MRR movement. It reconciles to the change in ending MRR.
+
+  - name: net_revenue_retention_pct
+    label: Net Revenue Retention (%)
+    model: ref('mart_nrr_monthly')
+    grain: movement_month
+    expression: nrr_pct
+    aggregation: max
+    time_dimension: movement_month
+    description: Current MRR for the fixed initial subscription cohort divided by its initial MRR.
+
+  - name: paid_revenue_usd
+    label: Paid revenue (USD)
+    model: ref('mart_revenue_monthly')
+    grain: revenue_month
+    expression: revenue_usd
+    aggregation: sum
+    time_dimension: revenue_month
+    description: Paid invoice revenue converted to USD using the fixture's monthly FX rates.
+
+  - name: cohort_retention_pct
+    label: Cohort retention (%)
+    model: ref('mart_retention_cohorts')
+    grain: cohort_month, activity_month
+    expression: retention_rate_pct
+    aggregation: max
+    dimensions:
+      - cohort_month
+      - activity_month
+      - period_number
+    description: Active customers divided by the fixed size of their signup cohort.
