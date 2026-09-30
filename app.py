@@ -53,20 +53,26 @@ def ensure_database() -> tuple[bool, str]:
     """Build the local DuckDB marts when the app starts in a clean environment."""
     if DATABASE_PATH.exists():
         return True, ""
-    command = [
+    base_command = [
         sys.executable,
         "-m",
         "dbt.cli.main",
-        "build",
         "--project-dir",
         "streaming_project",
         "--profiles-dir",
         ".",
         "--no-use-colors",
     ]
-    result = subprocess.run(command, cwd=PROJECT_ROOT, capture_output=True, text=True, check=False)
-    if result.returncode != 0:
-        return False, (result.stdout + "\n" + result.stderr).strip()
+    commands = [
+        [*base_command[:3], "seed", *base_command[3:]],
+        [*base_command[:3], "build", *base_command[3:], "--exclude", "resource_type:seed"],
+    ]
+    output = []
+    for command in commands:
+        result = subprocess.run(command, cwd=PROJECT_ROOT, capture_output=True, text=True, check=False)
+        output.extend([result.stdout, result.stderr])
+        if result.returncode != 0:
+            return False, "\n".join(output).strip()
     return DATABASE_PATH.exists(), "dbt completed without creating the expected DuckDB database."
 
 

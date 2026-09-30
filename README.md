@@ -92,7 +92,7 @@ It is a local synthetic-data demo, not a production reporting system.
 
 ### Deployment
 
-The application is compatible with Streamlit Community Cloud and similar Python hosting services. It uses `app.py` as the entry point and installs dependencies from `requirements.txt`. In a clean environment, the app runs the pinned dbt Core build once to materialize the tested DuckDB marts before loading the dashboard; no credentials or external database are required.
+The application is compatible with Streamlit Community Cloud and similar Python hosting services. It uses `app.py` as the entry point and installs dependencies from `requirements.txt`. In a clean environment, the app loads the versioned seeds and then runs the pinned dbt Core build to materialize and test the DuckDB marts before loading the dashboard; no credentials or external database are required.
 
 ## Key models
 
