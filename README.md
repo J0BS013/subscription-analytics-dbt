@@ -2,6 +2,8 @@
 
 A local dbt project for subscription analytics. It loads versioned synthetic data into DuckDB and produces tested models for MRR, revenue, churn, retention, customer activity, and product events.
 
+**[Open the live demo →](https://subscription-analytics-dbt.streamlit.app/)**
+
 ## What it calculates
 
 - Monthly recurring revenue and monthly revenue.

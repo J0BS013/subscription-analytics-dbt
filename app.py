@@ -15,7 +15,7 @@ import streamlit as st
 
 DATABASE_PATH = Path(__file__).parent / "streaming_project" / "streaming_data.duckdb"
 PROJECT_ROOT = Path(__file__).parent
-MOVEMENT_COLORS = {"new": "#32c48d", "expansion": "#6ea8fe", "reactivation": "#b99cff", "contraction": "#f6bd60", "churn": "#ff6b6b"}
+MOVEMENT_COLORS = {"new": "#0f8f68", "expansion": "#2563eb", "reactivation": "#7c3aed", "contraction": "#c47f00", "churn": "#d14343"}
 
 
 @st.cache_data(show_spinner="Loading tested dbt marts...")
@@ -120,14 +120,14 @@ with overview_tab:
     left, right = st.columns(2)
     with left:
         st.subheader("Ending MRR")
-        mrr_figure = px.area(mrr, x="month_label", y="ending_mrr_usd", markers=True, text="ending_mrr_usd", labels={"month_label": "Month", "ending_mrr_usd": "Ending MRR (USD)"}, color_discrete_sequence=["#6ea8fe"])
+        mrr_figure = px.area(mrr, x="month_label", y="ending_mrr_usd", markers=True, text="ending_mrr_usd", labels={"month_label": "Month", "ending_mrr_usd": "Ending MRR (USD)"}, color_discrete_sequence=["#2563eb"])
         mrr_figure.update_traces(texttemplate="US$%{text:.0f}", textposition="top center")
         mrr_figure.update_layout(xaxis_type="category", yaxis_rangemode="tozero", margin=dict(t=25, b=5, l=5, r=5), showlegend=False)
         st.plotly_chart(mrr_figure, width="stretch")
         st.caption("MRR rose from US$70 to US$140. It is a month-end balance, not a value to sum across months.")
     with right:
         st.subheader("Paid revenue")
-        revenue_figure = px.bar(revenue, x="month_label", y="revenue_usd", text="revenue_usd", labels={"month_label": "Month", "revenue_usd": "Paid revenue (USD)"}, color_discrete_sequence=["#32c48d"])
+        revenue_figure = px.bar(revenue, x="month_label", y="revenue_usd", text="revenue_usd", labels={"month_label": "Month", "revenue_usd": "Paid revenue (USD)"}, color_discrete_sequence=["#0f8f68"])
         revenue_figure.update_traces(texttemplate="US$%{text:.1f}", textposition="outside")
         revenue_figure.update_layout(xaxis_type="category", yaxis_rangemode="tozero", margin=dict(t=25, b=5, l=5, r=5), showlegend=False)
         st.plotly_chart(revenue_figure, width="stretch")
@@ -170,8 +170,8 @@ with retention_tab:
         st.caption("The cohort-size test ensures that inactive customers remain in the denominator.")
     with right:
         st.subheader("Net Revenue Retention")
-        nrr_figure = px.line(nrr, x="month_label", y="nrr_pct", markers=True, text="nrr_pct", labels={"month_label": "Month", "nrr_pct": "NRR (%)"}, color_discrete_sequence=["#b99cff"])
-        nrr_figure.add_hline(y=100, line_dash="dash", line_color="#9aa0a6", annotation_text="100% baseline")
+        nrr_figure = px.line(nrr, x="month_label", y="nrr_pct", markers=True, text="nrr_pct", labels={"month_label": "Month", "nrr_pct": "NRR (%)"}, color_discrete_sequence=["#7c3aed"])
+        nrr_figure.add_hline(y=100, line_dash="dash", line_color="#64748b", annotation_text="100% baseline")
         nrr_figure.update_traces(texttemplate="%{text:.1f}%", textposition="top center")
         nrr_figure.update_layout(xaxis_type="category", yaxis_ticksuffix="%", margin=dict(t=25, b=5, l=5, r=5), showlegend=False)
         st.plotly_chart(nrr_figure, width="stretch")
